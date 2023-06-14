@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"fmt"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"log"
@@ -23,6 +24,7 @@ func NewContactRepository() *ContactRepository {
 
 func (r *ContactRepository) AddContact(ctx context.Context, c model.Contact) error {
 	c.Status = InitialStatus
+	fmt.Printf("%+v\n", c)
 	item, err := attributevalue.MarshalMap(c)
 
 	log.Printf("item: %+v", item)
@@ -39,4 +41,29 @@ func (r *ContactRepository) AddContact(ctx context.Context, c model.Contact) err
 	}
 
 	return err
+}
+
+func (r *ContactRepository) GetContact(ctx context.Context, id string) (*model.Contact, error) {
+
+	key, err := attributevalue.MarshalMap(id)
+
+	if err != nil {
+		log.Printf("Error in marshal %v. Error: %v\n", id, err)
+	}
+
+	response, err := r.dbClient.GetItem(ctx,
+		&dynamodb.GetItemInput{Key: key, TableName: &TableName})
+
+	var contact model.Contact
+
+	if err != nil {
+		log.Printf("Couldn't get info about %v. Here's why: %v\n", id, err)
+	} else {
+		err = attributevalue.UnmarshalMap(response.Item, &contact)
+		if err != nil {
+			log.Printf("Couldn't unmarshal response. Here's why: %v\n", err)
+		}
+	}
+
+	return &contact, err
 }

@@ -16,4 +16,5 @@ type Contact struct {
 
 type ContactRepository interface {
 	AddContact(ctx context.Context, c Contact) error
+	GetContact(ctx context.Context, id string) (Contact, error)
 }
