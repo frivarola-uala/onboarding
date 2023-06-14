@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"context"
-	"fmt"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"log"
@@ -26,7 +25,7 @@ func (r *ContactRepository) AddContact(ctx context.Context, c model.Contact) err
 	c.Status = InitialStatus
 	item, err := attributevalue.MarshalMap(c)
 
-	fmt.Printf("item: %+v", item)
+	log.Printf("item: %+v", item)
 	if err != nil {
 		log.Fatalf("Error parsing contact. || err: %v", err)
 	}
